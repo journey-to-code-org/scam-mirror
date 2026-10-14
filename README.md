@@ -2,7 +2,7 @@
 
 **Five scams. Five different traps. Would you recognize yours?**
 
-Scam Mirror is a privacy-first, frontend-only social-engineering simulator. It places a participant inside one of five fictional attacks, records their decisions only in memory, and generates a supportive debrief showing the pressure tactics, warning signs, potential consequences, and safer alternatives.
+Scam Mirror is a privacy-first, frontend-only social-engineering simulator. A visit opens directly inside one of five randomly selected fictional attacks, records decisions only in memory, and generates a supportive debrief showing the pressure tactics, warning signs, potential consequences, and safer alternatives. Campaign or social-post copy should provide participants with the educational context before they follow the link.
 
 This is an educational simulation. It is not a real job, security alert, payment, coding assessment, or authorization flow. Use fictional sample values only.
 

@@ -17,30 +17,6 @@ function focusHeading() {
   });
 }
 
-function renderIntro() {
-  document.body.className = "mode-intro";
-  document.title = "Scam Mirror — Social Engineering Simulator";
-  app.className = "intro-view";
-  app.innerHTML = `
-    <section class="intro-shell">
-      <p class="eyebrow">How do you decide under pressure?</p>
-      <h1>Five encounters. Five different traps. <em>Would you recognize yours?</em></h1>
-      <p class="lede">A short interactive experience about trust, urgency, and the choices we make when something important lands in our inbox.</p>
-      <div class="consent-card">
-        <div><span class="consent-number">05</span><p>Distinct encounters. One private learning experience.</p></div>
-        <ul class="trust-list">
-          <li>Every situation, organization, and action is fictional</li>
-          <li>No real job, account, payment, or authorization is involved</li>
-          <li>Anything you enter stays in this tab and is not saved</li>
-        </ul>
-        <p class="consent-note">By continuing, you understand that this is a fictional educational experience. Use invented details only.</p>
-        <button class="primary" data-action="begin">Begin <span aria-hidden="true">→</span></button>
-      </div>
-      <p class="privacy-line"><span aria-hidden="true">●</span> Frontend only · no analytics · no storage · no account required</p>
-    </section>`;
-  focusHeading();
-}
-
 function getDevelopmentScenario() {
   const local = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
   const requested = new URLSearchParams(location.search).get("scenario");
@@ -50,6 +26,12 @@ function getDevelopmentScenario() {
 function beginScenario(useDevelopmentSelection = true) {
   engine.start(useDevelopmentSelection ? getDevelopmentScenario() : undefined, lastScenarioId);
   renderStage();
+}
+
+function leaveForAnother() {
+  lastScenarioId = engine.scenario?.id || lastScenarioId;
+  engine.reset();
+  beginScenario(false);
 }
 
 function renderArtifact(artifact) {
@@ -125,7 +107,7 @@ function renderReveal() {
       ${report.scenario.id === "dream-job" ? '<article class="sample-report"><h3>Fictional application data exposed</h3><p>This temporary view shows how separate details become a useful profile. Values are erased when you leave or restart.</p><dl id="sample-report"></dl></article>' : ""}
       <div class="education-grid"><article><span>Potential impact</span><h3>What could have happened</h3><ul>${list(report.scenario.consequences)}</ul></article><article><span>Defensive playbook</span><h3>How to protect yourself</h3><ul>${list(report.scenario.defenses)}</ul></article></div>
       <aside class="supportive"><strong>Social engineering exploits context, trust, and urgency—not intelligence.</strong><p>The goal is not to feel fooled. It is to notice which moments narrowed your attention, so the real version has less power.</p></aside>
-      <div class="reveal-actions"><button class="primary" data-action="another">Try another scenario <span aria-hidden="true">→</span></button><button class="secondary" data-action="home">Return home</button><a class="secondary" href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Inspect source ↗</a></div>
+      <div class="reveal-actions"><button class="primary" data-action="another">Try another scenario <span aria-hidden="true">→</span></button><a class="secondary" href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Inspect source ↗</a></div>
     </section>`;
   const sampleReport = app.querySelector("#sample-report");
   if (sampleReport) {
@@ -149,17 +131,16 @@ app.addEventListener("click", (event) => {
     return;
   }
   const action = event.target.closest("[data-action]")?.dataset.action;
-  if (action === "begin") beginScenario();
   if (action === "another") beginScenario(false);
   if (action === "back" && engine.back()) renderStage();
-  if (action === "exit" || action === "home") { engine.reset(); renderIntro(); }
+  if (action === "exit" || action === "home") leaveForAnother();
 });
 
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && engine.scenario) { engine.reset(); renderIntro(); }
+  if (event.key === "Escape" && engine.scenario && !engine.complete) leaveForAnother();
 });
 
 app.addEventListener("submit", (event) => event.preventDefault());
 
-window.addEventListener("pageshow", (event) => { if (event.persisted) { engine.reset(); renderIntro(); } });
-renderIntro();
+window.addEventListener("pageshow", (event) => { if (event.persisted) leaveForAnother(); });
+beginScenario();

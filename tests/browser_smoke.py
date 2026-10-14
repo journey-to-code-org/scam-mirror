@@ -22,7 +22,6 @@ with sync_playwright() as p:
         errors, interaction_requests = [], []
         page.on("pageerror", lambda error: errors.append(str(error)))
         page.goto(f"{base}/?scenario={scenario}", wait_until="networkidle")
-        page.locator('[data-action="begin"]').click()
         page.on("request", lambda request: interaction_requests.append(request.url))
         assert page.locator(".simulation-view").is_visible()
         assert page.locator(".site-header").is_hidden()
@@ -46,10 +45,11 @@ with sync_playwright() as p:
 
     mobile = browser.new_page(viewport={"width": 390, "height": 844}, color_scheme="dark")
     mobile.goto(f"{base}/?scenario=dream-job", wait_until="networkidle")
-    mobile.locator('[data-action="begin"]').click()
     assert mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    previous_title = mobile.title()
     mobile.locator("body").press("Escape")
-    assert mobile.locator(".intro-view").is_visible()
+    assert mobile.locator(".simulation-view").is_visible()
+    assert mobile.title() != previous_title
     browser.close()
 
 server.shutdown()
