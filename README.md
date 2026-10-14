@@ -1,72 +1,93 @@
 # Scam Mirror
 
-An immersive, fictional job-scam awareness experience implemented as **one self-contained static HTML file**.
+**Five scams. Five different traps. Would you recognize yours?**
 
-## How it works
+Scam Mirror is a privacy-first, frontend-only social-engineering simulator. It places a participant inside one of five fictional attacks, records their decisions only in memory, and generates a supportive debrief showing the pressure tactics, warning signs, potential consequences, and safer alternatives.
 
-1. Visitors first see a fictional recruiting message, provisional offer letter, and application form.
-2. On **Submit**, JavaScript calls `event.preventDefault()`, performs native browser validation, and reads the form with `FormData`.
-3. The site displays the submitted values locally alongside an explanation of how scammers can exploit each data point.
-4. The reveal also covers threats beyond forms: how commenting "Interested" on a LinkedIn post can expose your email to new connections, and how prompt injection hidden in job posts can manipulate AI tools. A calm recovery guide explains what to do if you already shared details with a real scammer (bank, SSN/ID, email and passwords, phone, malicious code). It closes with a share prompt (OS share sheet, clipboard, or a LinkedIn share link, all user-initiated).
-5. The original form inputs are reset immediately. **Erase displayed entries and restart** removes the values from the reveal DOM.
+This is an educational simulation. It is not a real job, security alert, payment, coding assessment, or authorization flow. Use fictional sample values only.
 
-All people, companies, job terms, and offers depicted here are fictional. This is an educational demonstration, not a real employment listing.
+## Scenarios
 
-The page follows the visitor's light or dark system preference (`prefers-color-scheme`) and respects `prefers-reduced-motion`. Previews: `preview.png` / `preview-dark.png` and `reveal-preview.png` / `reveal-preview-dark.png`.
+1. **The Dream Job** — recruitment fraud and personal-information harvesting. Preserves the original Cindervale Labs offer and sample application experience.
+2. **The Compromised Account** — credential phishing, lookalike destinations, and MFA approval abuse.
+3. **The Coding Challenge** — developer-targeted dependency, lifecycle-script, and workstation compromise risks.
+4. **The Equipment Reimbursement** — fake-check, advance-fee, and fictional vendor fraud.
+5. **The Open-Source Invitation** — OAuth consent phishing and excessive repository permission requests.
 
-## Privacy and safety properties
+Every scenario has three decision stages and its own presentation. No simulated credential, installation, payment, OAuth authorization, or network submission performs a real action.
 
-- **No backend, form endpoint, API, analytics, tracking pixel, cookies, or third-party library.**
-- No outbound network calls are made by site JavaScript. All styling and behavior are inline.
-- An explicit restrictive Content Security Policy blocks connections, native form posts, remote images, and third-party resources.
-- Values are not persisted in localStorage, sessionStorage, IndexedDB, cookies, or the URL.
-- Entered values are rendered using `textContent`, not `innerHTML`.
-- The mock ID field accepts at most four characters. The payroll field requests **bank name only**. Full government IDs, SSNs, routing numbers, and account numbers are *never requested*.
-- The site has outbound links to the public GitHub repo and fraud reporting agencies **only if a user clicks them**. Those pages are outside this app's privacy guarantees.
+## Architecture
 
-**Important limitations:** A static hosting provider can record visits to the HTML page; browser features and extensions may observe or autofill input fields. The app cannot guarantee privacy against a compromised browser, a modified distribution, browser plugins, keyloggers, or infrastructure run by another party. Use **invented sample values** when testing or demonstrating.
+The application has no build step and no runtime dependencies:
 
-**Source:** https://github.com/journey-to-code-org/scam-mirror
+```text
+index.html             Entry document and restrictive CSP
+src/main.js            Accessible renderer and interaction controller
+src/engine.js          Scenario lifecycle, selection, decisions, and reports
+src/scenarios.js       Five declarative scenario contracts
+src/styles.css         Shared system and scenario atmospheres
+tests/engine.test.js   Engine and security invariant tests
+tests/browser_smoke.py Optional Playwright coverage for all scenarios
+```
+
+Each scenario declares a unique ID, metadata, stages, decisions, red flags, consequences, and defensive actions. `SimulationEngine` knows only this contract; adding another conforming scenario does not require engine changes.
+
+`selectScenario` uses `Math.random()` and gives all five registered scenarios equal selection ranges. “Try another scenario” excludes the immediately completed scenario when alternatives exist. Selection history, decisions, and fictional form entries remain in JavaScript memory only and are cleared on restart or safe exit.
+
+For local automated browser testing, `?scenario=<id>` directly selects a scenario on `localhost`, `127.0.0.1`, or `file:` URLs. Deployed hosts ignore this development selector.
+
+## Privacy and security properties
+
+- No backend, application API, analytics, tracking pixels, cookies, or service worker.
+- No `localStorage`, `sessionStorage`, IndexedDB, or URL-based participant state.
+- No runtime `fetch`, `XMLHttpRequest`, `sendBeacon`, or `WebSocket` calls.
+- No real passwords, MFA codes, government IDs, bank accounts, payment details, or access tokens.
+- Sample recruitment values are never placed in the reveal and are discarded on restart.
+- User-entered values are not interpolated into HTML. Scenario strings are escaped before rendering.
+- The Content Security Policy blocks connections, form actions, frames, objects, remote fonts, and third-party scripts.
+- The favicon is an inline data image; all other runtime assets are local.
+- External source links open only after an intentional click with `noopener`, `noreferrer`, and a no-referrer policy.
+
+A static host can still record the initial document and asset requests. Browser extensions, autofill, screenshots, and compromised devices are outside the app’s guarantees.
 
 ## Run locally
 
-Open `index.html` directly in any modern browser. No server, package installation, build command, or environment variables are required.
+ES modules require an HTTP origin in most browsers. Start any static file server from the repository root, for example:
 
-## Publish an auditable public repository
+```bash
+python -m http.server 8000
+```
 
-1. Create a new **public** GitHub repository (for example, `scam-mirror`).
-2. Commit `index.html`, this README, `LICENSE`, and the optional local audit script.
-3. In `index.html`, set `PUBLIC_SOURCE_REPOSITORY` to its *actual, verified* URL, (this deployment uses `https://github.com/journey-to-code-org/scam-mirror`), then commit that change.
-4. Optionally serve `index.html` with GitHub Pages. Verify the static host does not inject scripts or analytics.
-5. Test the network panel: after the initial HTML document load, filling the form and pressing Submit should produce **zero** requests. Navigating to external reporting/source links is user-initiated and will contact those services.
+Then open `http://localhost:8000`.
 
-Until an actual public repository URL is configured, the reveal plainly says that the source link is not yet available and directs the user to View Page Source. **Do not imply that a repository exists before it is published.**
+## Tests
 
-## Automated browser smoke test (optional)
+The engine/security suite uses Node’s built-in modules and needs no installation:
 
-The application itself needs no dependencies. To run the test harness:
+```bash
+npm test
+```
+
+The optional browser suite traverses all five scenarios at desktop size, checks mobile overflow and safe exit behavior, verifies reveals, and observes interaction-time requests:
 
 ```bash
 python -m pip install playwright
 python -m playwright install chromium
-python tests/browser_smoke.py
+npm run test:browser
 ```
 
-If your Chromium is already installed elsewhere, set `CHROMIUM_PATH` to its executable. The smoke test uses a browser document populated from local HTML without a remote navigation. It checks reveal behavior, escaping, no observed network requests, and mobile overflow; the source audit checks that the app has no storage writes.
+Set `CHROMIUM_PATH` if Chromium is already installed elsewhere.
 
-## Manual QA checklist
+## Add a scenario
 
-- [ ] Can submit with sample values and see every entry, including blank optional fields.
-- [ ] Browser validation prevents a missing or invalid required value from reaching reveal.
-- [ ] Pressing Submit sends no HTTP request and changes no browser storage.
-- [ ] Rendering user strings such as `<script>alert(1)</script>` treats them as plain text.
-- [ ] Erase/restart clears previously displayed values.
-- [ ] No reveal wording is visible in the initial rendered view.
-- [ ] Works on narrow mobile viewports and with keyboard-only navigation.
-- [ ] Deployed public repo link works and source matches deployed HTML.
+1. Add one contract to `scenarios` in `src/scenarios.js` with a unique `id`, display metadata, at least one stage, decision consequences and risk values, red flags, real-world consequences, and defensive actions.
+2. Keep every interaction fictional and inert. Never collect credentials, payment data, tokens, or full identity data.
+3. Add engine assertions for cautious and risky paths and include the ID in browser coverage.
+4. Run the engine/security suite and, when Playwright is available, the browser suite.
+5. Document any new attack category here.
 
-## Threat model and scope
+## Source transparency
 
-Scam Mirror intentionally mimics common job-fraud tactics for education. It does **not** harvest credentials, payment details, or full identification documents. It should be deployed in a context where visitors can reasonably expect a security-awareness exercise, and it should never be used to impersonate an actual employer or trick real candidates into surrendering authentic sensitive information.
+The reveal links to the configured public source repository: <https://github.com/journey-to-code-org/scam-mirror>. If the project moves, update `SOURCE_URL` in `src/main.js`; the browser’s View Source and developer tools remain available for inspecting every runtime file.
 
-The fake company is **Cindervale Labs**; the brand mark is drawn entirely with CSS. No real corporate identity assets are used.
+Scam Mirror is licensed under the [MIT License](LICENSE). All organizations, people, offers, repositories, account alerts, vendors, payments, and authorization requests depicted by the simulator are fictional.
