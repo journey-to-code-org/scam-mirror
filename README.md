@@ -7,9 +7,12 @@ An immersive, fictional job-scam awareness experience implemented as **one self-
 1. Visitors first see a fictional recruiting message, provisional offer letter, and application form.
 2. On **Submit**, JavaScript calls `event.preventDefault()`, performs native browser validation, and reads the form with `FormData`.
 3. The site displays the submitted values locally alongside an explanation of how scammers can exploit each data point.
-4. The original form inputs are reset immediately. **Erase displayed entries and restart** removes the values from the reveal DOM.
+4. The reveal also covers threats beyond forms: how commenting "Interested" on a LinkedIn post can expose your email to new connections, and how prompt injection hidden in job posts can manipulate AI tools. A calm recovery guide explains what to do if you already shared details with a real scammer (bank, SSN/ID, email and passwords, phone, malicious code). It closes with a share prompt (OS share sheet, clipboard, or a LinkedIn share link, all user-initiated).
+5. The original form inputs are reset immediately. **Erase displayed entries and restart** removes the values from the reveal DOM.
 
 All people, companies, job terms, and offers depicted here are fictional. This is an educational demonstration, not a real employment listing.
+
+The page follows the visitor's light or dark system preference (`prefers-color-scheme`) and respects `prefers-reduced-motion`. Previews: `preview.png` / `preview-dark.png` and `reveal-preview.png` / `reveal-preview-dark.png`.
 
 ## Privacy and safety properties
 
