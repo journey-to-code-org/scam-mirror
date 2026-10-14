@@ -18,28 +18,26 @@ function focusHeading() {
 }
 
 function renderIntro() {
+  document.body.className = "mode-intro";
   document.title = "Scam Mirror — Social Engineering Simulator";
   app.className = "intro-view";
   app.innerHTML = `
     <section class="intro-shell">
-      <p class="eyebrow">Interactive security simulation</p>
-      <h1>Five scams. Five different traps. <em>Would you recognize yours?</em></h1>
-      <p class="lede">Step into one randomly selected social-engineering scenario. Make the calls you would make in real life, then see the pressure tactics reflected back.</p>
+      <p class="eyebrow">How do you decide under pressure?</p>
+      <h1>Five encounters. Five different traps. <em>Would you recognize yours?</em></h1>
+      <p class="lede">A short interactive experience about trust, urgency, and the choices we make when something important lands in our inbox.</p>
       <div class="consent-card">
-        <div><span class="consent-number">05</span><p>Distinct scenarios, one private learning experience.</p></div>
+        <div><span class="consent-number">05</span><p>Distinct encounters. One private learning experience.</p></div>
         <ul class="trust-list">
-          <li>No real job, account, payment, or authorization</li>
-          <li>Use fictional details only</li>
-          <li>No entries or decisions are transmitted or saved</li>
+          <li>Every situation, organization, and action is fictional</li>
+          <li>No real job, account, payment, or authorization is involved</li>
+          <li>Anything you enter stays in this tab and is not saved</li>
         </ul>
-        <label class="consent-check"><input id="consent" type="checkbox" /> <span>I understand this is a safe educational simulation.</span></label>
-        <button class="primary" data-action="begin" disabled>Enter the simulation <span aria-hidden="true">→</span></button>
+        <p class="consent-note">By continuing, you understand that this is a fictional educational experience. Use invented details only.</p>
+        <button class="primary" data-action="begin">Begin <span aria-hidden="true">→</span></button>
       </div>
       <p class="privacy-line"><span aria-hidden="true">●</span> Frontend only · no analytics · no storage · no account required</p>
     </section>`;
-  const consent = app.querySelector("#consent");
-  const begin = app.querySelector('[data-action="begin"]');
-  consent.addEventListener("change", () => { begin.disabled = !consent.checked; });
   focusHeading();
 }
 
@@ -57,7 +55,7 @@ function beginScenario(useDevelopmentSelection = true) {
 function renderArtifact(artifact) {
   if (artifact.type === "form") return `
     <form class="sample-form" id="sample-form" novalidate>
-      <p class="safe-note">Demo fields · fictional values only</p>
+      <p class="safe-note">For your privacy, use invented details.</p>
       <div class="form-row"><label>Sample full name<input name="fullName" autocomplete="off" placeholder="Jordan Example" maxlength="60" /></label><label>Sample email<input name="email" type="email" autocomplete="off" placeholder="jordan@example.test" maxlength="80" /></label></div>
       <div class="form-row"><label>Sample phone<input name="phone" autocomplete="off" placeholder="555-010-0199" maxlength="30" /></label><label>Sample address<input name="address" autocomplete="off" placeholder="12 Example Street" maxlength="100" /></label></div>
       <div class="form-row"><label>LinkedIn profile<input name="linkedin" autocomplete="off" placeholder="linkedin.com/in/sample" maxlength="100" /></label><label>GitHub profile<input name="github" autocomplete="off" placeholder="github.com/sample" maxlength="100" /></label></div>
@@ -72,13 +70,14 @@ function renderStage() {
   const scenario = engine.scenario;
   const current = engine.currentStage;
   const number = engine.stageIndex + 1;
-  document.title = `${scenario.title} — Scam Mirror`;
+  document.body.className = "mode-experience";
+  document.title = `${current.title} — Private access`;
   app.className = `simulation-view theme-${scenario.atmosphere}`;
   app.innerHTML = `
     <section class="simulation-shell">
       <header class="scenario-header">
-        <div><span class="scenario-kicker">Scenario ${scenarios.indexOf(scenario) + 1} of 5</span><strong>${escape(scenario.category)}</strong></div>
-        <button class="text-button" data-action="exit">Exit safely</button>
+        <div><span class="scenario-kicker">Private session</span><strong>${escape(current.eyebrow)}</strong></div>
+        <button class="text-button" data-action="exit">Close session</button>
       </header>
       <div class="progress progress-${number}" aria-label="Stage ${number} of ${scenario.stages.length}"><span></span></div>
       <div class="stage-layout">
@@ -93,7 +92,7 @@ function renderStage() {
       <section class="decision-panel" aria-labelledby="decision-title">
         <div><p class="eyebrow">Your move</p><h2 id="decision-title">What would you do?</h2></div>
         <div class="decision-grid">${current.decisions.map((decision, index) => `<button class="decision" data-decision="${escape(decision.id)}"><span>${String(index + 1).padStart(2, "0")}</span>${escape(decision.label)}<b aria-hidden="true">→</b></button>`).join("")}</div>
-        <div class="stage-nav">${engine.stageIndex ? '<button class="text-button" data-action="back">← Revisit previous decision</button>' : ""}<span>Nothing leaves this browser.</span></div>
+        <div class="stage-nav">${engine.stageIndex ? '<button class="text-button" data-action="back">← Go back</button>' : ""}<span>Step ${number} of ${scenario.stages.length}</span></div>
       </section>
     </section>`;
   focusHeading();
@@ -107,6 +106,7 @@ function getSample() {
 function renderReveal() {
   const report = engine.report;
   lastScenarioId = report.scenario.id;
+  document.body.className = "mode-reveal";
   document.title = `The Mirror — ${report.scenario.title}`;
   app.className = "reveal-view";
   app.innerHTML = `
