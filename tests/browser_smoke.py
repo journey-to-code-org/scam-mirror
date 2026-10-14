@@ -26,10 +26,16 @@ with sync_playwright() as p:
         page.locator('[data-action="begin"]').click()
         page.on("request", lambda request: interaction_requests.append(request.url))
         assert page.locator(".simulation-view").is_visible()
-        for _ in range(3):
+        for step in range(3):
+            if scenario == "dream-job" and step == 2:
+                page.locator('[name="fullName"]').fill("<script>alert(1)</script>")
+                page.locator('[name="email"]').fill("jordan@example.test")
             page.locator("[data-decision]").first.click()
         assert page.locator(".reveal-view").is_visible()
         assert page.locator(".decision-report li").count() == 3
+        if scenario == "dream-job":
+            assert page.locator("#sample-report dd").first.inner_text() == "<script>alert(1)</script>"
+            assert page.locator("body script").count() == 1
         assert interaction_requests == [], interaction_requests
         assert errors == [], errors
         previous_title = page.title()

@@ -58,9 +58,11 @@ function renderArtifact(artifact) {
   if (artifact.type === "form") return `
     <form class="sample-form" id="sample-form" novalidate>
       <p class="safe-note">Demo fields · fictional values only</p>
-      <label>Sample name<input name="sampleName" autocomplete="off" placeholder="Jordan Example" maxlength="60" /></label>
-      <label>Sample email<input name="sampleEmail" type="email" autocomplete="off" placeholder="jordan@example.test" maxlength="80" /></label>
-      <div class="form-row"><label>Desired salary<input name="sampleSalary" autocomplete="off" placeholder="$230,000" maxlength="30" /></label><label>Bank name only<input name="sampleBank" autocomplete="off" placeholder="Example Bank" maxlength="40" /></label></div>
+      <div class="form-row"><label>Sample full name<input name="fullName" autocomplete="off" placeholder="Jordan Example" maxlength="60" /></label><label>Sample email<input name="email" type="email" autocomplete="off" placeholder="jordan@example.test" maxlength="80" /></label></div>
+      <div class="form-row"><label>Sample phone<input name="phone" autocomplete="off" placeholder="555-010-0199" maxlength="30" /></label><label>Sample address<input name="address" autocomplete="off" placeholder="12 Example Street" maxlength="100" /></label></div>
+      <div class="form-row"><label>LinkedIn profile<input name="linkedin" autocomplete="off" placeholder="linkedin.com/in/sample" maxlength="100" /></label><label>GitHub profile<input name="github" autocomplete="off" placeholder="github.com/sample" maxlength="100" /></label></div>
+      <div class="form-row"><label>Desired salary<input name="salary" autocomplete="off" placeholder="$230,000" maxlength="30" /></label><label>Availability<select name="availability"><option value="">Choose a sample</option><option>Immediately</option><option>Within 2 weeks</option><option>Within a month</option></select></label></div>
+      <div class="form-row"><label>Mock ID reference (last 4 only)<input name="idFragment" inputmode="numeric" autocomplete="off" placeholder="1234" maxlength="4" /></label><label>Bank name only<input name="bankName" autocomplete="off" placeholder="Example Bank" maxlength="40" /></label></div>
       <p>No passwords, government IDs, account numbers, or routing numbers.</p>
     </form>`;
   return `<article class="artifact artifact-${escape(artifact.type)}"><header><strong>${escape(artifact.from)}</strong><span>${escape(artifact.meta)}</span></header><pre>${escape(artifact.content)}</pre></article>`;
@@ -120,10 +122,22 @@ function renderReveal() {
         <article><h3>What you were asked to do</h3><ol class="decision-report">${report.decisions.map((item) => `<li><strong>${escape(item.stageTitle)}</strong><span>${escape(item.label)}</span><p>${escape(item.consequence)}</p></li>`).join("")}</ol></article>
         <article><h3>Warning signs you recognized</h3>${report.recognized.length ? `<ul class="tag-list recognized">${list(report.recognized)}</ul>` : "<p>You moved quickly this time. That is exactly what these scenarios are designed to make visible.</p>"}<h3>Other warning signs presented</h3><ul class="tag-list">${list(report.missed)}</ul></article>
       </div>
+      ${report.scenario.id === "dream-job" ? '<article class="sample-report"><h3>Fictional application data exposed</h3><p>This temporary view shows how separate details become a useful profile. Values are erased when you leave or restart.</p><dl id="sample-report"></dl></article>' : ""}
       <div class="education-grid"><article><span>Potential impact</span><h3>What could have happened</h3><ul>${list(report.scenario.consequences)}</ul></article><article><span>Defensive playbook</span><h3>How to protect yourself</h3><ul>${list(report.scenario.defenses)}</ul></article></div>
       <aside class="supportive"><strong>Social engineering exploits context, trust, and urgency—not intelligence.</strong><p>The goal is not to feel fooled. It is to notice which moments narrowed your attention, so the real version has less power.</p></aside>
       <div class="reveal-actions"><button class="primary" data-action="another">Try another scenario <span aria-hidden="true">→</span></button><button class="secondary" data-action="home">Return home</button><a class="secondary" href="${SOURCE_URL}" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Inspect source ↗</a></div>
     </section>`;
+  const sampleReport = app.querySelector("#sample-report");
+  if (sampleReport) {
+    const labels = { fullName: "Full name", email: "Email", phone: "Phone", address: "Address", linkedin: "LinkedIn", github: "GitHub", salary: "Salary", availability: "Availability", idFragment: "ID reference", bankName: "Bank name" };
+    for (const [key, label] of Object.entries(labels)) {
+      const term = document.createElement("dt");
+      const description = document.createElement("dd");
+      term.textContent = label;
+      description.textContent = engine.sample[key]?.trim() || "Not provided";
+      sampleReport.append(term, description);
+    }
+  }
   focusHeading();
 }
 
