@@ -1,0 +1,10 @@
+{
+  "name": "scam-mirror",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node tests/engine.test.js",
+    "test:browser": "python tests/browser_smoke.py"
+  }
+}

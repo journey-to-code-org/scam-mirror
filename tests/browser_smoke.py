@@ -1,57 +1,50 @@
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Thread
 import os
 from playwright.sync_api import sync_playwright
 
-html=(Path(__file__).resolve().parents[1] / 'index.html').read_text(encoding='utf-8')
+ROOT = Path(__file__).resolve().parents[1]
+
+class QuietHandler(SimpleHTTPRequestHandler):
+    def log_message(self, *_):
+        pass
+
+os.chdir(ROOT)
+server = ThreadingHTTPServer(("127.0.0.1", 0), QuietHandler)
+Thread(target=server.serve_forever, daemon=True).start()
+base = f"http://127.0.0.1:{server.server_port}"
+
 with sync_playwright() as p:
- browser=p.chromium.launch(headless=True, executable_path=os.environ.get('CHROMIUM_PATH') or None, args=['--no-sandbox','--disable-dev-shm-usage','--disable-gpu'])
- page=browser.new_page(viewport={'width':1440,'height':1100}, device_scale_factor=1, color_scheme='light')
- errs=[];requests=[]
- page.on('pageerror', lambda err: errs.append(str(err)))
- page.on('request',lambda req: requests.append((req.method, req.url)))
- page.set_content(html,wait_until='domcontentloaded',timeout=15000)
- page.screenshot(path=str(Path(__file__).resolve().parents[1] / 'preview.png'),full_page=True,animations='disabled')
- assert 'shortlisted' in page.locator('#recruitment-view').inner_text().lower()
- assert page.locator('#reveal-view').is_hidden()
- page.locator('#candidate-form button[type=submit]').click()
- assert page.locator('#reveal-view').is_hidden(), 'Required values were not checked'
- payload={'fullName':'<script>alert(1)</script>', 'email':'jordan@example.test', 'phone':'555-010-0199', 'address':'12 Example Street, Fiction City','linkedin':'linkedin.com/in/jordan-test','github':'github.com/demo-test','salary':'$230000','idFragment':'1234','bankName':'Example Bank'}
- for key,val in payload.items(): page.locator('#'+key).fill(val)
- page.locator('#availability').select_option(label='Within 2 weeks')
- page.locator('#confirm').check()
- page.locator('#candidate-form button[type=submit]').click()
- assert page.locator('#reveal-view').is_visible()
- assert page.locator('#recruitment-view').is_hidden()
- assert page.locator('.exposure-card').count()==10
- assert page.locator('.severity').count()==10
- assert page.locator('#stat-filled').inner_text()=='10/10'
- assert page.locator('#linkedin-share').is_visible()
- assert page.locator('.field-value').first.inner_text()=='<script>alert(1)</script>'
- assert page.locator('body script').count()==1
- assert page.locator('#source-unset').is_hidden()
- assert page.locator('#source-link').get_attribute('href')=='https://github.com/journey-to-code-org/scam-mirror'
- assert page.evaluate('document.getElementById("fullName").value')==''
- assert not any(('localStorage.setItem(' in html, 'sessionStorage.setItem(' in html, 'document.cookie =' in html))
- assert not errs, errs
- assert requests==[],requests
- page.screenshot(path=str(Path(__file__).resolve().parents[1] / 'reveal-preview.png'),full_page=True,animations='disabled')
- page.locator('#restart-button').click()
- assert page.locator('#recruitment-view').is_visible()
- assert page.locator('.exposure-card').count()==0
- page.set_viewport_size({'width':390,'height':844})
- page.screenshot(path=str(Path(__file__).resolve().parents[1] / 'mobile-preview.png'),full_page=True,animations='disabled')
- assert page.evaluate('document.documentElement.scrollWidth <= document.documentElement.clientWidth'), 'Mobile horizontal overflow'
- root=Path(__file__).resolve().parents[1]
- light_bg=page.evaluate('getComputedStyle(document.body).backgroundColor')
- page.emulate_media(color_scheme='dark')
- assert page.evaluate('getComputedStyle(document.body).backgroundColor')!=light_bg, 'Dark scheme not applied'
- page.set_viewport_size({'width':1440,'height':1100})
- page.screenshot(path=str(root/'preview-dark.png'),full_page=True,animations='disabled')
- for key,val in payload.items(): page.locator('#'+key).fill(val)
- page.locator('#availability').select_option(label='Within 2 weeks')
- page.locator('#confirm').check()
- page.locator('#candidate-form button[type=submit]').click()
- page.screenshot(path=str(root/'reveal-preview-dark.png'),full_page=True,animations='disabled')
- assert requests==[],requests
- print('PASS: light/dark schemes, input validation, reveal field mapping, XSS safety, zero outbound requests, no storage, erase/restart, mobile no-overflow')
- browser.close()
+    browser = p.chromium.launch(headless=True, executable_path=os.environ.get("CHROMIUM_PATH") or None)
+    for scenario in ["dream-job", "compromised-account", "coding-challenge", "equipment-reimbursement", "open-source-invitation"]:
+        page = browser.new_page(viewport={"width": 1280, "height": 900}, color_scheme="light")
+        errors, interaction_requests = [], []
+        page.on("pageerror", lambda error: errors.append(str(error)))
+        page.goto(f"{base}/?scenario={scenario}", wait_until="networkidle")
+        page.locator("#consent").check()
+        page.locator('[data-action="begin"]').click()
+        page.on("request", lambda request: interaction_requests.append(request.url))
+        assert page.locator(".simulation-view").is_visible()
+        for _ in range(3):
+            page.locator("[data-decision]").first.click()
+        assert page.locator(".reveal-view").is_visible()
+        assert page.locator(".decision-report li").count() == 3
+        assert interaction_requests == [], interaction_requests
+        assert errors == [], errors
+        previous_title = page.title()
+        page.locator('[data-action="another"]').click()
+        assert page.title() != previous_title
+        page.close()
+
+    mobile = browser.new_page(viewport={"width": 390, "height": 844}, color_scheme="dark")
+    mobile.goto(f"{base}/?scenario=dream-job", wait_until="networkidle")
+    mobile.locator("#consent").check()
+    mobile.locator('[data-action="begin"]').click()
+    assert mobile.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth")
+    mobile.locator("body").press("Escape")
+    assert mobile.locator(".intro-view").is_visible()
+    browser.close()
+
+server.shutdown()
+print("PASS: five scenarios, reveals, no interaction requests, mobile layout, safe exit")
