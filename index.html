@@ -1,0 +1,1662 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; base-uri 'none'; form-action 'none'; connect-src 'none'; img-src 'none'; font-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; manifest-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; upgrade-insecure-requests"
+    />
+    <title>Cindervale Labs — Private Candidate Access</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        --bg: #0c1020;
+        --ink: #e9ecf6;
+        --muted: #a3aabc;
+        --line: #30374d;
+        --accent: #c8f66c;
+        --panel: #171c2f;
+        --paper: #f5f4ec;
+        --paperink: #202835;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        min-width: 320px;
+      }
+      body::before {
+        position: fixed;
+        z-index: -1;
+        content: "";
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse at 80% -25%, #34446e90 0, transparent 43%),
+          radial-gradient(ellipse at -10% 35%, #27365d55 0, transparent 48%);
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      a {
+        color: inherit;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .shell {
+        max-width: 1210px;
+        margin: 0 auto;
+        padding: 0 32px;
+      }
+      header {
+        height: 90px;
+        border-bottom: 1px solid #ffffff12;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 800;
+        font-size: 19px;
+        letter-spacing: -0.7px;
+      }
+      .brandmark {
+        width: 36px;
+        height: 36px;
+        position: relative;
+        background: var(--accent);
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        transform: rotate(-8deg);
+      }
+      .brandmark::before,
+      .brandmark::after {
+        content: "";
+        position: absolute;
+        background: #1a2a1b;
+        border-radius: 15px;
+      }
+      .brandmark::before {
+        width: 19px;
+        height: 3px;
+        transform: rotate(45deg);
+      }
+      .brandmark::after {
+        width: 3px;
+        height: 19px;
+        transform: rotate(45deg);
+      }
+      .brand small {
+        display: block;
+        color: #b2bad2;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2.2px;
+        margin-top: 1px;
+        font-weight: 650;
+      }
+      .top-meta {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        color: #c4cadd;
+        font-size: 12px;
+        letter-spacing: 0.2px;
+      }
+      .top-pip {
+        height: 7px;
+        width: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 15px #c8f669;
+      }
+      .tiny-pill {
+        border: 1px solid #556078;
+        padding: 8px 12px;
+        border-radius: 100px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1.3px;
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 38px;
+        padding-top: 80px;
+        padding-bottom: 68px;
+        align-items: center;
+      }
+      .eyebrow {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 2.7px;
+        color: var(--accent);
+        font-weight: 750;
+        display: flex;
+        align-items: center;
+        gap: 13px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 27px;
+        height: 1px;
+        background: var(--accent);
+      }
+      h1 {
+        font-size: clamp(44px, 5.15vw, 74px);
+        line-height: 1.06;
+        letter-spacing: -3.8px;
+        margin: 22px 0 21px;
+        font-weight: 750;
+        max-width: 720px;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero-copy {
+        font-size: 17px;
+        line-height: 1.75;
+        color: #abb5cd;
+        max-width: 565px;
+        margin: 0;
+      }
+      .role-metrics {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 33px;
+      }
+      .metric {
+        border: 1px solid #3a455f;
+        padding: 14px 17px;
+        border-radius: 12px;
+        background: #ffffff08;
+        min-width: 126px;
+      }
+      .metric-label {
+        font-size: 10px;
+        letter-spacing: 1.6px;
+        text-transform: uppercase;
+        color: #9ca8bf;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 7px;
+      }
+      .metric-value {
+        font-size: 15px;
+        letter-spacing: -0.4px;
+        font-weight: 730;
+      }
+      .notice {
+        margin-top: 28px;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        color: #d6c9ae;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .notice-dot {
+        flex: 0 0 8px;
+        height: 8px;
+        margin-top: 6px;
+        background: #ffcb7e;
+        transform: rotate(45deg);
+      }
+      .message-card {
+        border: 1px solid #526079;
+        background: linear-gradient(150deg, #222b42, #151d31);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 30px 65px #0006;
+        transform: rotate(1.1deg);
+      }
+      .mail-top {
+        background: #ffffff09;
+        padding: 21px 24px;
+        display: flex;
+        gap: 13px;
+        align-items: center;
+        border-bottom: 1px solid #ffffff17;
+      }
+      .avatar {
+        width: 43px;
+        height: 43px;
+        background: #dbc3b6;
+        color: #554139;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-size: 16px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+      .mail-from {
+        font-weight: 800;
+        font-size: 13px;
+      }
+      .mail-role {
+        font-size: 11px;
+        color: #9ca7c0;
+        margin-top: 5px;
+      }
+      .mail-tag {
+        margin-left: auto;
+        font-size: 10px;
+        color: #d9e0f0;
+        background: #34445c;
+        border-radius: 20px;
+        padding: 7px 9px;
+        white-space: nowrap;
+      }
+      .mail-body {
+        padding: 26px 28px 28px;
+      }
+      .mail-subject {
+        font-size: 21px;
+        font-weight: 750;
+        letter-spacing: -0.65px;
+        line-height: 1.32;
+        margin: 0 0 16px;
+      }
+      .mail-body p {
+        font-size: 13px;
+        line-height: 1.8;
+        color: #c1cbe0;
+        margin: 0 0 14px;
+      }
+      .mail-sign {
+        margin-top: 23px;
+        font-size: 12px;
+        color: #e7edf9;
+      }
+      .mail-sign span {
+        display: block;
+        color: #9ba9c3;
+        margin-top: 5px;
+      }
+      .section-line {
+        border-top: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 19px 0 24px;
+      }
+      .section-line span:first-child {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #acb7d0;
+      }
+      .section-line span:last-child {
+        font-size: 11px;
+        color: #9ea9c1;
+      }
+      .content {
+        display: grid;
+        grid-template-columns: minmax(0, 0.93fr) minmax(0, 1.07fr);
+        gap: 24px;
+        align-items: start;
+        padding-bottom: 110px;
+      }
+      .offer {
+        background: var(--paper);
+        color: var(--paperink);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 26px 55px #0004;
+      }
+      .offer-top {
+        padding: 29px 35px 23px;
+        border-bottom: 1px solid #deded8;
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .paper-logo {
+        color: #263548;
+        font-weight: 850;
+        letter-spacing: -1px;
+        font-size: 17px;
+      }
+      .paper-logo small {
+        font-size: 8px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        display: block;
+        color: #848b98;
+        margin-top: 5px;
+      }
+      .offer-tag {
+        font-size: 9px;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 1.1px;
+        border: 1px solid #ccd3d2;
+        border-radius: 4px;
+        padding: 8px;
+        white-space: nowrap;
+        color: #485b5a;
+      }
+      .offer-body {
+        padding: 29px 35px 33px;
+      }
+      .offer-date {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.25px;
+        color: #858f99;
+        font-weight: 700;
+      }
+      .offer h2 {
+        font-size: 31px;
+        line-height: 1.12;
+        letter-spacing: -1.2px;
+        margin: 18px 0 22px;
+      }
+      .offer p {
+        font-size: 13px;
+        line-height: 1.95;
+        color: #53606d;
+      }
+      .letter-sal {
+        margin: 25px 0;
+        background: #e7ebe3;
+        border-left: 3px solid #668666;
+        padding: 18px 21px;
+      }
+      .letter-sal strong {
+        font-size: 24px;
+        color: #263b34;
+        display: block;
+        letter-spacing: -0.8px;
+      }
+      .letter-sal span {
+        font-size: 11px;
+        color: #61776b;
+      }
+      .signature {
+        margin-top: 35px;
+        font:
+          italic 25px Georgia,
+          serif;
+        color: #536070;
+        letter-spacing: -1.7px;
+      }
+      .sign-role {
+        font-size: 11px;
+        color: #85929e;
+        margin-top: 5px;
+      }
+      .letter-stamp {
+        margin-top: 31px;
+        padding: 13px;
+        border: 1px dashed #c0c7bf;
+        font-size: 10px;
+        line-height: 1.7;
+        color: #87928c;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-align: center;
+      }
+      .application {
+        border: 1px solid #475370;
+        background: #1a2134;
+        border-radius: 18px;
+        padding: 33px;
+        box-shadow: 0 26px 55px #0002;
+      }
+      .form-kicker {
+        font-size: 10px;
+        color: var(--accent);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-weight: 800;
+      }
+      .application h2 {
+        font-size: 31px;
+        line-height: 1.15;
+        margin: 11px 0;
+        letter-spacing: -1.15px;
+      }
+      .subtle {
+        color: #a7b0c5;
+        font-size: 12px;
+        line-height: 1.75;
+        margin: 0 0 24px;
+      }
+      .form-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 22px 0 19px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.8px;
+        font-weight: 800;
+        color: #b3bfd5;
+      }
+      .form-divider::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: #39465f;
+      }
+      .fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 17px 14px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+      }
+      .wide {
+        grid-column: 1/-1;
+      }
+      label {
+        font-size: 12px;
+        color: #d7dfed;
+        font-weight: 650;
+      }
+      .optional {
+        color: #8d9ab2;
+        font-weight: 450;
+      }
+      input,
+      select {
+        background: #11192b;
+        border: 1px solid #46516a;
+        border-radius: 9px;
+        outline: 0;
+        color: #f3f6fd;
+        padding: 13px 14px;
+        width: 100%;
+        min-height: 46px;
+        transition:
+          border 0.16s,
+          box-shadow 0.16s;
+        font-size: 13px;
+      }
+      input::placeholder {
+        color: #7e8ba3;
+      }
+      input:hover,
+      select:hover {
+        border-color: #70809c;
+      }
+      input:focus,
+      select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px #c8f66c22;
+      }
+      select {
+        appearance: none;
+        background-image:
+          linear-gradient(45deg, transparent 50%, #acb9cb 50%),
+          linear-gradient(135deg, #acb9cb 50%, transparent 50%);
+        background-position:
+          calc(100% - 19px) 20px,
+          calc(100% - 14px) 20px;
+        background-size:
+          5px 5px,
+          5px 5px;
+        background-repeat: no-repeat;
+        padding-right: 40px;
+      }
+      select:invalid {
+        color: #7e8ba3;
+      }
+      .field-note {
+        font-size: 10px;
+        color: #8f9bb2;
+        line-height: 1.5;
+      }
+      .verify-block {
+        background: #222b3d;
+        border: 1px solid #3c4b66;
+        border-radius: 11px;
+        padding: 17px;
+        margin-top: 3px;
+      }
+      .verify-intro {
+        font-size: 11px;
+        color: #b6c0d3;
+        line-height: 1.6;
+        margin: 0 0 15px;
+      }
+      .verify-block .fields {
+        gap: 15px;
+      }
+      .check-row {
+        margin-top: 24px;
+        display: flex;
+        align-items: flex-start;
+        gap: 11px;
+        font-size: 11px;
+        color: #a9b6cc;
+        line-height: 1.65;
+      }
+      .check-row input {
+        min-height: auto;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--accent);
+        margin-top: 2px;
+        flex: 0 0 16px;
+      }
+      .apply-button {
+        width: 100%;
+        margin-top: 23px;
+        background: var(--accent);
+        color: #15221a;
+        border: 0;
+        border-radius: 10px;
+        font-weight: 850;
+        font-size: 14px;
+        padding: 18px 20px;
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        box-shadow: 0 12px 30px #c8f61e25;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      .apply-button:hover {
+        background: #ddff95;
+        transform: translateY(-1px);
+      }
+      .under-submit {
+        font-size: 10px;
+        color: #8492a8;
+        text-align: center;
+        margin-top: 14px;
+        line-height: 1.6;
+      }
+      .page-footer {
+        border-top: 1px solid #ffffff14;
+        color: #8591a6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        font-size: 11px;
+        padding: 26px 0 40px;
+      }
+      /* Debrief view */
+      .reveal {
+        --accent: #b7f078;
+        background: #0b1120;
+        min-height: 100vh;
+      }
+      .reveal header {
+        height: 83px;
+      }
+      .reveal-intro {
+        padding: 80px 0 44px;
+        max-width: 900px;
+      }
+      .reveal-intro .eyebrow {
+        color: var(--accent);
+      }
+      .reveal h1 {
+        font-size: clamp(43px, 5.1vw, 70px);
+        margin-bottom: 17px;
+      }
+      .reveal-intro p {
+        font-size: 17px;
+        line-height: 1.8;
+        color: #b3bfd4;
+        max-width: 745px;
+      }
+      .truth-card {
+        background: linear-gradient(125deg, #243628, #192a2c);
+        border: 1px solid #5c8564;
+        border-radius: 16px;
+        padding: 23px 26px;
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        margin: 10px 0 36px;
+      }
+      .truth-icon {
+        display: grid;
+        place-items: center;
+        flex: 0 0 36px;
+        height: 36px;
+        width: 36px;
+        background: #caf794;
+        color: #1d3929;
+        border-radius: 50%;
+        font-size: 20px;
+        font-weight: 900;
+      }
+      .truth-card h2 {
+        font-size: 17px;
+        margin: 0 0 7px;
+        color: #eff8ee;
+      }
+      .truth-card p {
+        margin: 0;
+        color: #c0d9c5;
+        font-size: 13px;
+        line-height: 1.75;
+      }
+      .debrief-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin: 52px 0 22px;
+      }
+      .debrief-heading h2 {
+        font-size: 28px;
+        letter-spacing: -1.1px;
+        margin: 0;
+      }
+      .debrief-heading span {
+        font-size: 12px;
+        color: #9aaac3;
+      }
+      .exposure-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+      .exposure-card {
+        background: #182237;
+        border: 1px solid #34445e;
+        border-radius: 13px;
+        padding: 20px 21px;
+        min-width: 0;
+      }
+      .exposure-card .field-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #a5b6d0;
+        font-weight: 750;
+        display: block;
+        margin-bottom: 11px;
+      }
+      .exposure-card .field-value {
+        font-size: 17px;
+        font-weight: 700;
+        color: #eff3fd;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+        white-space: pre-wrap;
+        line-height: 1.5;
+        margin-bottom: 12px;
+      }
+      .exposure-card .field-value.empty {
+        color: #8a98ab;
+        font-weight: 500;
+        font-style: italic;
+      }
+      .exposure-card .risk-text {
+        border-top: 1px solid #344157;
+        padding-top: 12px;
+        color: #b4c0d5;
+        font-size: 12px;
+        line-height: 1.7;
+        margin: 0;
+      }
+      .debrief-panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 50px;
+      }
+      .debrief-panel {
+        border: 1px solid #34445b;
+        background: #172034;
+        border-radius: 15px;
+        padding: 28px;
+      }
+      .debrief-panel h2 {
+        font-size: 22px;
+        letter-spacing: -0.6px;
+        margin: 0 0 20px;
+      }
+      .debrief-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 15px;
+      }
+      .debrief-list li {
+        font-size: 13px;
+        color: #c6d0e0;
+        line-height: 1.65;
+        padding-left: 21px;
+        position: relative;
+      }
+      .debrief-list li::before {
+        content: "↳";
+        position: absolute;
+        left: 0;
+        top: 0;
+        color: #c9ef82;
+      }
+      .debrief-list strong {
+        color: #f0f4fe;
+      }
+      .source-panel {
+        border: 1px solid #697d65;
+        border-radius: 16px;
+        background: linear-gradient(110deg, #202f2c, #182436);
+        padding: 31px;
+        margin-top: 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 24px;
+      }
+      .source-panel h2 {
+        font-size: 22px;
+        letter-spacing: -0.5px;
+        margin: 0 0 8px;
+      }
+      .source-panel p {
+        font-size: 12px;
+        line-height: 1.7;
+        color: #bfcccb;
+        margin: 0;
+        max-width: 650px;
+      }
+      .source-link,
+      .secondary-button {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 9px;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        padding: 15px 20px;
+        min-height: 46px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .source-link {
+        background: #c9f48c;
+        color: #193021;
+        border: 0;
+      }
+      .source-link:hover {
+        background: #e0ffb6;
+      }
+      .source-unset {
+        padding: 12px 14px;
+        background: #ffffff12;
+        border-radius: 9px;
+        font-size: 11px;
+        color: #d3e1d6;
+        line-height: 1.6;
+        max-width: 250px;
+      }
+      .audit-details {
+        margin-top: 18px;
+        border: 1px solid #304059;
+        border-radius: 12px;
+        padding: 18px 22px;
+        font-size: 12px;
+        color: #c7d5ea;
+      }
+      .audit-details summary {
+        cursor: pointer;
+        font-weight: 800;
+      }
+      .audit-details p {
+        line-height: 1.75;
+        color: #b5c3d8;
+      }
+      .audit-details code {
+        color: #e2fcb8;
+        overflow-wrap: anywhere;
+      }
+      .reveal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 45px;
+        border-top: 1px solid #2c3b52;
+        padding: 31px 0 60px;
+      }
+      .secondary-button {
+        background: transparent;
+        border: 1px solid #6c7e91;
+        color: #f5f7fd;
+      }
+      .secondary-button:hover {
+        background: #ffffff0f;
+      }
+      .outbound {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .outbound a {
+        color: #bad2e6;
+        font-size: 12px;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+          padding-top: 55px;
+        }
+        .message-card {
+          max-width: 620px;
+          transform: none;
+        }
+        .content {
+          grid-template-columns: 1fr;
+        }
+        .offer {
+          max-width: none;
+        }
+        .section-line {
+          margin-top: 0;
+        }
+      }
+      @media (max-width: 700px) {
+        .shell {
+          padding: 0 19px;
+        }
+        header {
+          height: 76px;
+        }
+        .top-meta .tiny-pill {
+          display: none;
+        }
+        .hero {
+          padding-top: 46px;
+          padding-bottom: 52px;
+          gap: 38px;
+        }
+        h1 {
+          letter-spacing: -2.4px;
+        }
+        .hero-copy {
+          font-size: 15px;
+        }
+        .message-card {
+          max-width: none;
+        }
+        .mail-body {
+          padding: 23px 21px;
+        }
+        .content {
+          gap: 17px;
+          padding-bottom: 60px;
+        }
+        .offer-top,
+        .offer-body {
+          padding-left: 22px;
+          padding-right: 22px;
+        }
+        .application {
+          padding: 25px 21px;
+        }
+        .fields,
+        .exposure-grid,
+        .debrief-panels {
+          grid-template-columns: 1fr;
+        }
+        .wide {
+          grid-column: auto;
+        }
+        .reveal-intro {
+          padding-top: 52px;
+        }
+        .debrief-heading {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 9px;
+        }
+        .source-panel {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+        .source-link {
+          width: 100%;
+        }
+        .page-footer {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .truth-card {
+          padding: 19px;
+        }
+        .reveal-footer {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main id="recruitment-view">
+      <div class="shell">
+        <header>
+          <div class="brand">
+            <span class="brandmark" aria-hidden="true"></span
+            ><span>Cindervale <small>LABS / TALENT</small></span>
+          </div>
+          <div class="top-meta">
+            <span class="top-pip" aria-hidden="true"></span>Candidate portal
+            <span class="tiny-pill">Invitation only</span>
+          </div>
+        </header>
+        <section class="hero" aria-labelledby="invite-title">
+          <div>
+            <div class="eyebrow">Direct outreach / Senior engineering</div>
+            <h1 id="invite-title" tabindex="-1">
+              You've been <em>shortlisted.</em>
+            </h1>
+            <p class="hero-copy">
+              Your engineering background stood out. Our leadership team has
+              reserved an accelerated opportunity for a small group of remote
+              developers — and we'd like you to be one of them.
+            </p>
+            <div class="role-metrics">
+              <div class="metric">
+                <span class="metric-label">Base salary</span
+                ><span class="metric-value">$198k–$242k</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Location</span
+                ><span class="metric-value">100% remote</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Equipment</span
+                ><span class="metric-value">$8k allowance</span>
+              </div>
+            </div>
+            <div class="notice">
+              <span class="notice-dot" aria-hidden="true"></span
+              ><span
+                >Expedited intake: candidate reservations are released after 24
+                hours if no response is received.</span
+              >
+            </div>
+          </div>
+          <aside class="message-card" aria-label="Recruiter outreach">
+            <div class="mail-top">
+              <div class="avatar" aria-hidden="true">LR</div>
+              <div>
+                <div class="mail-from">Leah Rowan</div>
+                <div class="mail-role">
+                  Principal Talent Partner · Cindervale Labs
+                </div>
+              </div>
+              <div class="mail-tag">Priority</div>
+            </div>
+            <div class="mail-body">
+              <p class="mail-subject">
+                Confidential: Senior Platform Engineer — next steps
+              </p>
+              <p>Hello,</p>
+              <p>
+                After reviewing public engineering profiles, we believe you're a
+                strong fit for a confidential, fully remote platform position.
+              </p>
+              <p>
+                We can move directly to a provisional offer without a lengthy
+                interview cycle. The first step is to verify your candidate
+                profile so our team can reserve your compensation band.
+              </p>
+              <p>
+                Please complete the intake today. We only have a few priority
+                slots remaining.
+              </p>
+              <div class="mail-sign">
+                <strong>Leah Rowan</strong
+                ><span>Principal Talent Partner<br />Cindervale Labs</span>
+              </div>
+            </div>
+          </aside>
+        </section>
+        <div class="section-line">
+          <span>01 / Your reserved offer</span
+          ><span
+            >Review the details, then confirm your candidate profile ↓</span
+          >
+        </div>
+        <div class="content">
+          <section class="offer" aria-label="Provisional offer letter">
+            <div class="offer-top">
+              <div class="paper-logo">
+                ◈ Cindervale <small>Engineering / People</small>
+              </div>
+              <div class="offer-tag">Private offer brief</div>
+            </div>
+            <div class="offer-body">
+              <div class="offer-date" id="offer-date">
+                PERSONAL &amp; CONFIDENTIAL
+              </div>
+              <h2>Your provisional offer.</h2>
+              <p>Dear Candidate,</p>
+              <p>
+                We are pleased to extend a priority invitation for the position
+                of <strong>Senior Platform Engineer</strong> with Cindervale
+                Labs.
+              </p>
+              <p>
+                This opportunity is designed for experienced engineers who
+                thrive independently. Your public technical portfolio qualified
+                you for expedited review, allowing us to bypass the standard
+                interview queue.
+              </p>
+              <div class="letter-sal">
+                <strong>$220,000 USD</strong
+                ><span
+                  >Illustrative annual base · Plus sign-on and equipment
+                  support</span
+                >
+              </div>
+              <p>
+                To reserve your onboarding slot, please complete the candidate
+                verification form. Our staffing coordinator will then provide
+                your employment documents and start-date confirmation.
+              </p>
+              <p>We look forward to what we can build together.</p>
+              <div class="signature">Leah Rowan</div>
+              <div class="sign-role">
+                Principal Talent Partner / Cindervale Labs
+              </div>
+              <div class="letter-stamp">
+                Candidate intake preferred within 24 hours<br />Provisional
+                terms · Pending profile confirmation
+              </div>
+            </div>
+          </section>
+          <section class="application" aria-label="Candidate application">
+            <div class="form-kicker">02 / Confirm your profile</div>
+            <h2>Secure your priority review.</h2>
+            <p class="subtle">
+              Complete the profile below to confirm your eligibility. Our team
+              will match your details against the reserved offer.
+            </p>
+            <form id="candidate-form" autocomplete="off" method="post">
+              <div class="form-divider">Personal information</div>
+              <div class="fields">
+                <div class="field wide">
+                  <label for="fullName">Full legal name *</label
+                  ><input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    placeholder="e.g. Jordan Morgan"
+                    autocomplete="off"
+                    maxlength="150"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="email">Personal email *</label
+                  ><input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    autocomplete="off"
+                    maxlength="254"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="phone">Mobile phone *</label
+                  ><input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="(555) 010-1234"
+                    autocomplete="off"
+                    maxlength="50"
+                    required
+                  />
+                </div>
+                <div class="field wide">
+                  <label for="address">Mailing address *</label
+                  ><input
+                    id="address"
+                    name="address"
+                    type="text"
+                    placeholder="Street address, city, state, ZIP"
+                    autocomplete="off"
+                    maxlength="300"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="form-divider">Professional profile</div>
+              <div class="fields">
+                <div class="field">
+                  <label for="linkedin">LinkedIn profile *</label
+                  ><input
+                    id="linkedin"
+                    name="linkedin"
+                    type="text"
+                    placeholder="linkedin.com/in/..."
+                    autocomplete="off"
+                    maxlength="300"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="github">GitHub profile *</label
+                  ><input
+                    id="github"
+                    name="github"
+                    type="text"
+                    placeholder="github.com/..."
+                    autocomplete="off"
+                    maxlength="300"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="salary">Expected annual salary *</label
+                  ><input
+                    id="salary"
+                    name="salary"
+                    type="text"
+                    placeholder="$220,000"
+                    autocomplete="off"
+                    maxlength="80"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="availability">Earliest start date *</label
+                  ><select id="availability" name="availability" required>
+                    <option value="" disabled selected>
+                      Select availability
+                    </option>
+                    <option>Immediately</option>
+                    <option>Within 1 week</option>
+                    <option>Within 2 weeks</option>
+                    <option>Within 30 days</option>
+                    <option>Negotiable</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-divider">Optional verification</div>
+              <div class="verify-block">
+                <p class="verify-intro">
+                  To reduce onboarding delays, you can optionally include
+                  preliminary verification details now.
+                </p>
+                <div class="fields">
+                  <div class="field">
+                    <label for="idFragment"
+                      >Government ID reference
+                      <span class="optional">(optional)</span></label
+                    ><input
+                      id="idFragment"
+                      name="idFragment"
+                      type="text"
+                      placeholder="Last 4 characters only"
+                      autocomplete="off"
+                      maxlength="4"
+                      pattern="[a-zA-Z0-9]{0,4}"
+                      inputmode="text"
+                    /><span class="field-note"
+                      >Last four characters only. Never provide a full ID
+                      number.</span
+                    >
+                  </div>
+                  <div class="field">
+                    <label for="bankName"
+                      >Payroll bank name
+                      <span class="optional">(optional)</span></label
+                    ><input
+                      id="bankName"
+                      name="bankName"
+                      type="text"
+                      placeholder="Bank name only"
+                      autocomplete="off"
+                      maxlength="100"
+                    /><span class="field-note"
+                      >Do not enter routing, card, or account numbers.</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <label class="check-row"
+                ><input
+                  id="confirm"
+                  name="confirm"
+                  type="checkbox"
+                  required
+                /><span
+                  >I confirm the information I entered is accurate and
+                  understand the staffing team may contact me using these
+                  details.</span
+                ></label
+              >
+              <button class="apply-button" type="submit">
+                Submit candidate profile <span aria-hidden="true">↗</span>
+              </button>
+              <p class="under-submit">
+                Priority applicants may receive a response in 1–2 business days.
+              </p>
+            </form>
+          </section>
+        </div>
+        <footer class="page-footer">
+          <span
+            >© <span id="copyright-year">2026</span> Cindervale Labs. All rights
+            reserved.</span
+          ><span>Private candidate intake · Remote talent opportunities</span>
+        </footer>
+      </div>
+    </main>
+
+    <main id="reveal-view" class="reveal" hidden tabindex="-1">
+      <div class="shell">
+        <header>
+          <div class="brand">
+            <span class="brandmark" aria-hidden="true"></span
+            ><span>SCAM <small>MIRROR / FIELD REPORT</small></span>
+          </div>
+          <span class="tiny-pill">Simulation complete</span>
+        </header>
+        <div class="reveal-intro">
+          <div class="eyebrow">The mirror / What just happened</div>
+          <h1>This was a <em>recruitment scam simulation.</em></h1>
+          <p>
+            The recruiter, offer, and company were fictional. But the details
+            you were asked to provide are exactly the kind of data fraudulent
+            job listings can turn into targeted scams, impersonation, and
+            identity theft.
+          </p>
+        </div>
+        <div class="truth-card" role="status">
+          <div class="truth-icon" aria-hidden="true">✓</div>
+          <div>
+            <h2>Your entries stayed in this browser tab.</h2>
+            <p>
+              This application has no backend, API calls, analytics, cookies, or
+              third-party assets. Clicking Submit was intercepted locally: no
+              form was posted, and nothing was placed in browser storage. Your
+              values are displayed below only to demonstrate their potential
+              value to a scammer. The hosting provider may still log ordinary
+              page requests, but does not receive these form entries through
+              this app.
+            </p>
+          </div>
+        </div>
+        <div class="debrief-heading">
+          <h2>The profile you almost handed over</h2>
+          <span id="field-count">Your submitted fields</span>
+        </div>
+        <div id="exposure-grid" class="exposure-grid" aria-live="polite"></div>
+        <div class="debrief-panels">
+          <section class="debrief-panel">
+            <h2>Red flags in the pitch</h2>
+            <ul class="debrief-list">
+              <li>
+                <strong>Unsolicited contact.</strong> A stranger claimed to have
+                evaluated your engineering profile.
+              </li>
+              <li>
+                <strong>Unusually high compensation.</strong> The offer was
+                designed to overpower your skepticism.
+              </li>
+              <li>
+                <strong>No real interview.</strong> A provisional job offer
+                arrived before any meaningful screening.
+              </li>
+              <li>
+                <strong>Artificial urgency.</strong> “Reserved slot” and “24
+                hours” pushed you toward acting before verifying.
+              </li>
+              <li>
+                <strong>Early identity and payroll questions.</strong> Even
+                optional verification during initial outreach is a warning sign.
+              </li>
+              <li>
+                <strong>Impressive-looking letter.</strong> Attractive design
+                and a signature do not establish legitimacy.
+              </li>
+            </ul>
+          </section>
+          <section class="debrief-panel">
+            <h2>How to verify a real recruiter</h2>
+            <ul class="debrief-list">
+              <li>
+                <strong>Find the position independently.</strong> Check the
+                employer's own careers site, not just the supplied link.
+              </li>
+              <li>
+                <strong>Confirm the recruiter's identity.</strong> Contact the
+                company using publicly listed channels and verify email domains
+                carefully.
+              </li>
+              <li>
+                <strong>Keep sensitive details back.</strong> Don't provide
+                government IDs, SSNs, or bank information before a legitimate,
+                verified offer and secure onboarding.
+              </li>
+              <li>
+                <strong>Examine the form.</strong> Look for questionable
+                domains, missing privacy notices, or unusually broad data
+                requests.
+              </li>
+              <li>
+                <strong>Question off-platform pressure.</strong> Be skeptical of
+                immediate moves to encrypted chats, payment requests, or
+                “equipment checks.”
+              </li>
+              <li>
+                <strong>Report abuse.</strong> Flag fake listings to the
+                platform and report suspected fraud to relevant authorities.
+              </li>
+            </ul>
+          </section>
+        </div>
+        <section class="source-panel" aria-labelledby="source-heading">
+          <div>
+            <h2 id="source-heading">Inspect the source. Verify the promise.</h2>
+            <p>
+              One human-readable HTML file, inline CSS and JavaScript, a
+              restrictive Content Security Policy, no dependencies, and no
+              transmission code. Inspect the source to verify how Submit is
+              handled, and look for suspicious APIs such as fetch,
+              XMLHttpRequest, sendBeacon, storage, and form endpoints.
+            </p>
+          </div>
+          <a
+            id="source-link"
+            class="source-link"
+            target="_blank"
+            rel="noopener noreferrer"
+            referrerpolicy="no-referrer"
+            hidden
+            >View public GitHub source ↗</a
+          >
+          <div id="source-unset" class="source-unset">
+            Public GitHub URL not configured in this local copy. Use your
+            browser's “View Page Source” command to inspect the entire app.
+          </div>
+        </section>
+        <details class="audit-details">
+          <summary>Technical privacy details</summary>
+          <p>
+            Submitting this form triggers
+            <code>event.preventDefault()</code> and reads only the in-memory
+            field values. The form is immediately cleared, and the values are
+            rendered as text using <code>textContent</code>. No data is saved
+            with <code>localStorage</code>, <code>sessionStorage</code>,
+            cookies, or IndexedDB. No <code>fetch()</code>,
+            <code>XMLHttpRequest</code>, <code>WebSocket</code>, or
+            <code>sendBeacon()</code> calls are made. Clicking “Erase and
+            restart” removes the reveal values from the DOM.
+          </p>
+          <p>
+            Browser features such as autofill, extensions, browser history,
+            screenshots, and your hosting provider are outside this page's
+            control. Use sample data when demonstrating the exercise.
+          </p>
+        </details>
+        <footer class="reveal-footer">
+          <button type="button" class="secondary-button" id="restart-button">
+            Erase displayed entries and restart ↺
+          </button>
+          <div class="outbound">
+            <a
+              href="https://reportfraud.ftc.gov/"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              >Report to the FTC ↗</a
+            ><a
+              href="https://www.ic3.gov/"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              >Report to IC3 ↗</a
+            ><a
+              href="https://www.linkedin.com/help/linkedin/"
+              target="_blank"
+              rel="noopener noreferrer"
+              referrerpolicy="no-referrer"
+              >LinkedIn help ↗</a
+            >
+          </div>
+        </footer>
+      </div>
+    </main>
+    <script>
+      "use strict";
+      // Replace this string with a real, publicly reachable repository URL after publishing.
+      // Leave it blank when working offline; the reveal will explain how to View Source.
+      const PUBLIC_SOURCE_REPOSITORY = "";
+
+      const fieldDescriptions = [
+        {
+          key: "fullName",
+          label: "Full legal name",
+          risk: "Links public accounts and other records to a real identity. Makes fake recruiter follow-ups feel personal.",
+        },
+        {
+          key: "email",
+          label: "Personal email",
+          risk: "Can be added to targeted phishing lists, used for account recovery attempts, or resold to other fraud operators.",
+        },
+        {
+          key: "phone",
+          label: "Mobile phone",
+          risk: "Enables SMS phishing, fake interview calls, messaging-app outreach, and identity-matching across leaked databases.",
+        },
+        {
+          key: "address",
+          label: "Mailing address",
+          risk: "Supplies location and identity context, potentially supporting impersonation, harassment, or convincing delivery scams.",
+        },
+        {
+          key: "linkedin",
+          label: "LinkedIn profile",
+          risk: "Reveals employers, contacts, career history, and people a scammer could impersonate in a tailored message.",
+        },
+        {
+          key: "github",
+          label: "GitHub profile",
+          risk: "Exposes projects, technologies, affiliations, and development workflows for specialized engineering-themed lures.",
+        },
+        {
+          key: "salary",
+          label: "Salary expectations",
+          risk: "Helps scammers tailor an offer to exactly the level needed to appear attractive or believable.",
+        },
+        {
+          key: "availability",
+          label: "Availability",
+          risk: "Suggests how urgently you are looking and when an attacker might pressure you into immediate action.",
+        },
+        {
+          key: "idFragment",
+          label: "Government ID reference (last 4)",
+          risk: "Even small fragments can support a verification pretext. A criminal version might ask for your entire ID or SSN; never provide it here.",
+        },
+        {
+          key: "bankName",
+          label: "Payroll bank name",
+          risk: "Can support bank-branded phishing and fake payroll onboarding. A criminal version may demand routing and account numbers.",
+        },
+      ];
+
+      const form = document.getElementById("candidate-form");
+      const recruitment = document.getElementById("recruitment-view");
+      const reveal = document.getElementById("reveal-view");
+      const exposure = document.getElementById("exposure-grid");
+      document.getElementById("copyright-year").textContent = String(
+        new Date().getFullYear(),
+      );
+      document.getElementById("offer-date").textContent =
+        new Intl.DateTimeFormat("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }).format(new Date()) + "  /  PERSONAL & CONFIDENTIAL";
+
+      // No form action and CSP form-action 'none': even unexpected native submission is blocked.
+      // Browser-native constraint validation is invoked explicitly for full control.
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const submitted = new FormData(form);
+        const fragment = document.createDocumentFragment();
+        let provided = 0;
+        for (const field of fieldDescriptions) {
+          const raw = submitted.get(field.key);
+          const value = (typeof raw === "string" ? raw : "").trim();
+          if (value) provided += 1;
+          const card = document.createElement("article");
+          card.className = "exposure-card";
+          const label = document.createElement("span");
+          label.className = "field-label";
+          label.textContent = field.label;
+          const display = document.createElement("div");
+          display.className = "field-value" + (value ? "" : " empty");
+          display.textContent = value || "Not provided";
+          const risk = document.createElement("p");
+          risk.className = "risk-text";
+          risk.textContent = field.risk;
+          card.append(label, display, risk);
+          fragment.append(card);
+        }
+        exposure.replaceChildren(fragment);
+        document.getElementById("field-count").textContent =
+          provided + " of " + fieldDescriptions.length + " fields filled";
+        // Clear inputs immediately; only visible on-screen explanation remains in the DOM.
+        form.reset();
+        for (const control of form.elements) {
+          if (
+            control instanceof HTMLInputElement &&
+            control.type !== "checkbox"
+          )
+            control.value = "";
+        }
+        recruitment.hidden = true;
+        reveal.hidden = false;
+        document.title = "Scam Mirror — The Reveal";
+        window.scrollTo({ top: 0, behavior: "auto" });
+        reveal.focus({ preventScroll: true });
+      });
+
+      document
+        .getElementById("restart-button")
+        .addEventListener("click", function () {
+          exposure.replaceChildren();
+          document.getElementById("field-count").textContent =
+            "Your submitted fields";
+          form.reset();
+          for (const control of form.elements) {
+            if (
+              control instanceof HTMLInputElement &&
+              control.type !== "checkbox"
+            )
+              control.value = "";
+          }
+          reveal.hidden = true;
+          recruitment.hidden = false;
+          document.title = "Cindervale Labs — Private Candidate Access";
+          window.scrollTo({ top: 0, behavior: "auto" });
+          document.getElementById("invite-title").focus?.();
+        });
+
+      // Set the source link only when the deployer supplies an actual public GitHub URL.
+      if (
+        /^https:\/\/github\.com\/[A-Za-z0-9-]+\/[A-Za-z0-9._-]+\/?$/.test(
+          PUBLIC_SOURCE_REPOSITORY,
+        )
+      ) {
+        const sourceLink = document.getElementById("source-link");
+        sourceLink.href = PUBLIC_SOURCE_REPOSITORY;
+        sourceLink.hidden = false;
+        document.getElementById("source-unset").hidden = true;
+      }
+
+      // Prevent bfcache/history revival from showing stale input values.
+      window.addEventListener("pageshow", function () {
+        if (!recruitment.hidden) form.reset();
+      });
+    </script>
+  </body>
+</html>
