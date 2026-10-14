@@ -23,6 +23,8 @@ All people, companies, job terms, and offers depicted here are fictional. This i
 
 **Important limitations:** A static hosting provider can record visits to the HTML page; browser features and extensions may observe or autofill input fields. The app cannot guarantee privacy against a compromised browser, a modified distribution, browser plugins, keyloggers, or infrastructure run by another party. Use **invented sample values** when testing or demonstrating.
 
+**Source:** https://github.com/journey-to-code-org/scam-mirror
+
 ## Run locally
 
 Open `index.html` directly in any modern browser. No server, package installation, build command, or environment variables are required.
@@ -31,7 +33,7 @@ Open `index.html` directly in any modern browser. No server, package installatio
 
 1. Create a new **public** GitHub repository (for example, `scam-mirror`).
 2. Commit `index.html`, this README, `LICENSE`, and the optional local audit script.
-3. In `index.html`, set `PUBLIC_SOURCE_REPOSITORY` to its *actual, verified* URL, e.g. `https://github.com/YOUR_USERNAME/scam-mirror`, then commit that change.
+3. In `index.html`, set `PUBLIC_SOURCE_REPOSITORY` to its *actual, verified* URL, (this deployment uses `https://github.com/journey-to-code-org/scam-mirror`), then commit that change.
 4. Optionally serve `index.html` with GitHub Pages. Verify the static host does not inject scripts or analytics.
 5. Test the network panel: after the initial HTML document load, filling the form and pressing Submit should produce **zero** requests. Navigating to external reporting/source links is user-initiated and will contact those services.
 

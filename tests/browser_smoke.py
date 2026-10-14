@@ -25,8 +25,8 @@ with sync_playwright() as p:
  assert page.locator('.exposure-card').count()==10
  assert page.locator('.field-value').first.inner_text()=='<script>alert(1)</script>'
  assert page.locator('body script').count()==1
- assert page.locator('#source-unset').is_visible()
- assert page.locator('#source-link').is_hidden()
+ assert page.locator('#source-unset').is_hidden()
+ assert page.locator('#source-link').get_attribute('href')=='https://github.com/journey-to-code-org/scam-mirror'
  assert page.evaluate('document.getElementById("fullName").value')==''
  assert not any(('localStorage.setItem(' in html, 'sessionStorage.setItem(' in html, 'document.cookie =' in html))
  assert not errs, errs
